@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HotelBooking - Luxury Stay Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --primary: #1a2a3a; 
+            --accent: #3498db; 
+            --bg: #f8fafc;
+            --card-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            --transition: all 0.3s ease;
+        }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: var(--bg); 
+            color: #334155;
+            line-height: 1.6;
+        }
+        .navbar { 
+            background: var(--primary); 
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar-brand { 
+            font-weight: 600; 
+            letter-spacing: -0.5px;
+            color: white !important; 
+        }
+        .card { 
+            border: none; 
+            border-radius: 16px; 
+            box-shadow: var(--card-shadow); 
+            transition: var(--transition);
+            background: white;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        .btn { border-radius: 10px; padding: 0.6rem 1.5rem; font-weight: 500; transition: var(--transition); }
+        .btn-primary { background: var(--accent); border: none; }
+        .btn-primary:hover { background: #2980b9; transform: scale(1.02); }
+        
+        #login-section, #register-section, #admin-section, #user-section { 
+            display: none; 
+            animation: fadeIn 0.5s ease; 
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .hero { 
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200'); 
+            background-size: cover; 
+            background-position: center;
+            color: white; 
+            padding: 120px 0; 
+            text-align: center; 
+            border-radius: 0 0 40px 40px;
+            margin-bottom: 50px;
+        }
+        .hero h1 { font-weight: 700; margin-bottom: 20px; }
+        .hero p { opacity: 0.9; font-weight: 300; }
+
+        .stat-card { 
+            background: rgba(255,255,255,0.1); 
+            border: 1px solid rgba(255,255,255,0.2); 
+            border-radius: 12px; 
+            padding: 24px; 
+            text-align: center;
+            height: 100%;
+        }
+        .badge-soft { padding: 6px 12px; border-radius: 20px; font-weight: 500; }
+        .bg-soft-success { background: #dcfce7; color: #166534; }
+        .bg-soft-warning { background: #fef9c3; color: #854d0e; }
+        .bg-soft-danger { background: #fee2e2; color: #991b1b; }
+
+        .hotel-img-wrapper { height: 200px; overflow: hidden; position: relative; }
+        .hotel-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: var(--transition); }
+        .card:hover .hotel-img-wrapper img { transform: scale(1.1); }
+        
+        /* Map & Weather Styles */
+        .weather-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        .map-container {
+            height: 300px;
+            width: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .form-control { border-radius: 10px; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; }
+        .form-control:focus { box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1); border-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="#" onclick="showSection('hero')"><i class="fas fa-hotel me-2"></i>HotelBooking</a>
+        <div class="ms-auto d-flex align-items-center">
+            <span id="user-display" class="text-white me-3 fw-medium"></span>
+            <button id="logout-btn" class="btn btn-outline-light btn-sm px-3" style="display:none;" onclick="logout()">Logout</button>
+            <button id="login-nav-btn" class="btn btn-outline-light btn-sm px-4" onclick="showSection('login')">Login</button>
+        </div>
+    </div>
+</nav>
+
+<div id="hero-section" class="hero">
+    <div class="container">
+        <h1 class="display-4">Welcome to HotelBooking</h1>
+        <p class="lead mb-4">Discover unparalleled luxury and comfort for your next escape.</p>
+        <button class="btn btn-primary btn-lg px-5 shadow" onclick="showSection('login')">Start Exploring</button>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <!-- Login Section -->
+    <div id="login-section" class="mx-auto" style="max-width: 450px;">
+        <div class="card p-5">
+            <h3 class="text-center mb-4 fw-bold">Sign In</h3>
+            <form id="login-form">
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-bold">EMAIL ADDRESS</label>
+                    <input type="email" id="login-email" class="form-control" placeholder="name@example.com" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label text-muted small fw-bold">PASSWORD</label>
+                    <input type="password" id="login-pass" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mb-3 shadow-sm">Sign In</button>
+            </form>
+            <p class="text-center mt-3 text-muted small">Don't have an account? <a href="#" class="text-decoration-none fw-bold" onclick="showSection('register')">Create one now</a></p>
+        </div>
+    </div>
+
+    <!-- Register Section -->
+    <div id="register-section" class="mx-auto" style="max-width: 450px;">
+        <div class="card p-5">
+            <h3 class="text-center mb-4 fw-bold">Create Account</h3>
+            <form id="register-form">
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-bold">FULL NAME</label>
+                    <input type="text" id="reg-name" class="form-control" placeholder="John Doe" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-bold">EMAIL ADDRESS</label>
+                    <input type="email" id="reg-email" class="form-control" placeholder="name@example.com" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label text-muted small fw-bold">PASSWORD</label>
+                    <input type="password" id="reg-pass" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mb-3 shadow-sm">Register</button>
+            </form>
+            <p class="text-center mt-3 text-muted small">Already have an account? <a href="#" class="text-decoration-none fw-bold" onclick="showSection('login')">Sign In</a></p>
+        </div>
+    </div>
+
+    <!-- User Section -->
+    <div id="user-section">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold mb-0">Discover Stays</h4>
+                    <span class="text-muted small fw-medium" id="hotel-count"></span>
+                </div>
+                <div class="row g-4" id="hotel-list"></div>
+            </div>
+            <div class="col-lg-4">
+                <h4 class="fw-bold mb-4">My Itinerary</h4>
+                <div id="my-bookings"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal fade" id="bookingModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="bookingModalLabel">Book Your Stay</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="text-muted small mb-4" id="bookingHotelName"></p>
+                    <form id="booking-modal-form">
+                        <input type="hidden" id="modal-hotel-id">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small fw-bold">CHECK-IN</label>
+                                <input type="date" id="modal-check-in" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small fw-bold">CHECK-OUT</label>
+                                <input type="date" id="modal-check-out" class="form-control" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mt-4 shadow-sm py-3">Confirm Reservation</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+        <!-- existing success modal content -->
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg text-center" style="border-radius: 20px;">
+                <div class="modal-body p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+                    </div>
+                    <h3 class="fw-bold mb-3">Booking Confirmed!</h3>
+                    <p class="text-muted mb-4">Your luxury escape has been reserved successfully. You can view the details in your itinerary.</p>
+                    <button type="button" class="btn btn-primary w-100 py-3 shadow-sm" data-bs-dismiss="modal">Great, thanks!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Modal -->
+    <div class="modal fade" id="mapModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="mapModalLabel">Hotel Location</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div id="map-frame" class="map-container">
+                        <!-- Google Maps Embed will go here -->
+                    </div>
+                    <p class="text-center text-muted small"><i class="fas fa-info-circle me-1"></i> This is a simulated map view for the project demo.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Section -->
+    <div id="admin-section">
+        <div class="row">
+            <div class="col-12 mb-5">
+                <div class="card p-5 border-0 text-white" style="background: linear-gradient(135deg, #1a2a3a 0%, #34495e 100%);">
+                    <h4 class="mb-4 fw-bold opacity-75">Analytics Overview</h4>
+                    <div class="row g-4" id="analytics-overview"></div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold mb-0">Reservation Ledger</h4>
+                    <span class="badge bg-soft-success text-success px-3 py-2 rounded-pill small">Real-time Feed</span>
+                </div>
+                <div id="all-reservations"></div>
+            </div>
+            <div class="col-lg-5">
+                <h4 class="fw-bold mb-4">Guest Engagement</h4>
+                <div class="card border-0 mb-4">
+                    <div class="card-body p-0" id="user-activity"></div>
+                </div>
+
+                <h4 class="fw-bold mb-4">Hotel Inventory</h4>
+                <div id="admin-hotel-list" class="d-flex flex-column gap-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Hotel Modal -->
+    <div class="modal fade" id="editHotelModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Update Hotel Info</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="edit-hotel-form">
+                        <input type="hidden" id="edit-hotel-id">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold">HOTEL IMAGE</label>
+                            <div class="d-flex gap-2 mb-2">
+                                <input type="text" id="edit-hotel-image" class="form-control" placeholder="Image URL..." required>
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('hotel-file-input').click()">
+                                    <i class="fas fa-folder-open"></i>
+                                </button>
+                            </div>
+                            <input type="file" id="hotel-file-input" class="d-none" accept="image/*" onchange="uploadHotelImage(this)">
+                            <div class="form-text">Paste a link or click the folder icon to upload from your computer.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold">HOTEL NAME</label>
+                            <input type="text" id="edit-hotel-name" class="form-control" required>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small fw-bold">LOCATION</label>
+                                <input type="text" id="edit-hotel-location" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small fw-bold">PRICE/NT</label>
+                                <input type="number" id="edit-hotel-price" class="form-control" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mt-4 shadow-sm py-3">Update Property</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = '/hotel-api/api';
+    const API_KEY = 'hotel-secret-key-2026';
+    const CURRENCY = 'RM'; // Change this to '$', '€', etc.
+    let currentUser = null;
+
+    // Helper function to format date: 2026-04-10 -> 10 Apr 2026
+    const formatDate = (dateStr) => {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    };
+
+    function showSection(section) {
+        ['hero-section', 'login-section', 'register-section', 'user-section', 'admin-section'].forEach(s => {
+            const el = document.getElementById(s);
+            if (el) el.style.display = 'none';
+        });
+        const target = document.getElementById(section + '-section');
+        if (target) target.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function apiCall(endpoint, method = 'GET', body = null) {
+        const options = {
+            method,
+            headers: { 'X-API-KEY': API_KEY, 'Content-Type': 'application/json' }
+        };
+        if (body) options.body = JSON.stringify(body);
+        const res = await fetch(`${API_BASE}${endpoint}`, options);
+        return await res.json();
+    }
+
+    document.getElementById('login-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const res = await apiCall('/users/login', 'POST', {
+            email: document.getElementById('login-email').value,
+            password: document.getElementById('login-pass').value
+        });
+        if (res.success) {
+            currentUser = res.user;
+            onLogin();
+        } else alert(res.message);
+    };
+
+    document.getElementById('register-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const res = await apiCall('/users', 'POST', {
+            name: document.getElementById('reg-name').value,
+            email: document.getElementById('reg-email').value,
+            password: document.getElementById('reg-pass').value
+        });
+        if (res.success) {
+            alert('Account created! Please sign in.');
+            showSection('login');
+        } else alert(res.message);
+    };
+
+    function onLogin() {
+        document.getElementById('user-display').innerText = `Hi, ${currentUser.name}`;
+        document.getElementById('logout-btn').style.display = 'inline-block';
+        document.getElementById('login-nav-btn').style.display = 'none';
+        
+        if (currentUser.role === 'admin') {
+            showSection('admin');
+            loadAdminData();
+        } else {
+            showSection('user');
+            loadUserData();
+        }
+    }
+
+    function logout() {
+        currentUser = null;
+        document.getElementById('user-display').innerText = '';
+        document.getElementById('logout-btn').style.display = 'none';
+        document.getElementById('login-nav-btn').style.display = 'inline-block';
+        showSection('hero');
+    }
+
+    async function loadUserData() {
+        const hotels = await apiCall('/hotels');
+        const bookings = await apiCall('/bookings');
+        
+        document.getElementById('hotel-count').innerText = `${hotels.data.length} Properties Found`;
+        
+        // Simulated Weather for demo
+        const weatherTypes = ['Sunny 28°C', 'Partly Cloudy 24°C', 'Clear 26°C', 'Light Rain 22°C'];
+        
+        document.getElementById('hotel-list').innerHTML = hotels.data.map(h => {
+            const randomWeather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
+            return `
+                <div class="col-md-6">
+                    <div class="card h-100 border-0">
+                        <div class="hotel-img-wrapper">
+                            <div class="weather-badge"><i class="fas fa-cloud-sun me-1"></i> ${randomWeather}</div>
+                            <img src="${h.image_url || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800'}" alt="${h.name}">
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="fw-bold mb-0">${h.name}</h5>
+                                <span class="text-primary fw-bold">${CURRENCY}${h.price_per_night}<small class="text-muted fw-normal" style="font-size:0.7rem">/nt</small></span>
+                            </div>
+                            <p class="text-muted small mb-3"><i class="fas fa-map-marker-alt me-1"></i> ${h.location}</p>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary flex-grow-1 btn-sm shadow-sm" onclick="bookHotel(${h.id}, '${h.name}')">Book Now</button>
+                                <button class="btn btn-outline-primary btn-sm shadow-sm" onclick="showMap('${h.location}', '${h.name}')"><i class="fas fa-map"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        const myBookings = bookings.data.filter(b => b.user_id == currentUser.id);
+        
+        document.getElementById('my-bookings').innerHTML = myBookings.length ? myBookings.map(b => `
+            <div class="card p-3 mb-3 border-0">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="mb-0 fw-bold small">${b.hotel_name}</h6>
+                    <span class="badge-soft small ${b.status === 'confirmed' ? 'bg-soft-success' : (b.status === 'cancelled' ? 'bg-soft-danger' : 'bg-soft-warning')}">${b.status.toUpperCase()}</span>
+                </div>
+                <p class="small text-muted mb-3"><i class="far fa-calendar-alt me-1"></i> ${formatDate(b.check_in)} - ${formatDate(b.check_out)}</p>
+                ${b.status !== 'cancelled' ? `<button class="btn btn-link btn-sm text-danger p-0 text-decoration-none fw-bold" style="font-size:0.7rem" onclick="cancelBooking(${b.id})">CANCEL BOOKING</button>` : ''}
+            </div>
+        `).join('') : '<p class="text-muted text-center small p-4 bg-white rounded-4">No reservations yet.</p>';
+    }
+
+    async function cancelBooking(id) {
+        if (!confirm('Are you sure you want to cancel this reservation?')) return;
+        const res = await apiCall(`/bookings/cancel/${id}`, 'POST');
+        if (res.success) {
+            alert('Reservation cancelled.');
+            loadUserData();
+        } else alert(res.message);
+    }
+
+    async function loadAdminData() {
+        const [stats, avail, activity, bookings, hotels] = await Promise.all([
+            apiCall('/analytics/overview'),
+            apiCall('/analytics/availability'),
+            apiCall('/analytics/activity'),
+            apiCall('/bookings'),
+            apiCall('/hotels')
+        ]);
+
+        if (stats.success && avail.success && activity.success && bookings.success && hotels.success) {
+            // ... existing analytics code ...
+            document.getElementById('analytics-overview').innerHTML = `
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <h3 class="fw-bold mb-1">${stats.data.total_bookings}</h3>
+                        <p class="small mb-0 opacity-75">Bookings</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <h3 class="fw-bold mb-1">${CURRENCY}${stats.data.total_revenue}</h3>
+                        <p class="small mb-0 opacity-75">Revenue</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <h3 class="fw-bold mb-1">${avail.data.available_today}</h3>
+                        <p class="small mb-0 opacity-75">Available Today</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <h3 class="fw-bold mb-1">${stats.data.total_users}</h3>
+                        <p class="small mb-0 opacity-75">Active Users</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('all-reservations').innerHTML = bookings.data.map(b => `
+                <div class="card p-3 mb-2 border-0">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <span class="text-primary fw-bold small">#${b.id}</span>
+                            <span class="ms-2 fw-medium">${b.user_name}</span>
+                        </div>
+                        <select class="form-select form-select-sm w-auto border-0 bg-light rounded-pill px-3" style="font-size:0.75rem" onchange="updateStatus(${b.id}, this.value)">
+                            <option value="pending" ${b.status==='pending'?'selected':''}>Pending</option>
+                            <option value="confirmed" ${b.status==='confirmed'?'selected':''}>Confirmed</option>
+                            <option value="cancelled" ${b.status==='cancelled'?'selected':''}>Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="text-muted" style="font-size:0.8rem">
+                         <i class="fas fa-hotel me-1"></i> ${b.hotel_name} 
+                         <span class="mx-2 text-muted">|</span>
+                         <i class="far fa-calendar-alt me-1"></i> ${formatDate(b.check_in)} to ${formatDate(b.check_out)}
+                     </div>
+                </div>
+            `).join('');
+
+            document.getElementById('user-activity').innerHTML = activity.data.top_users.map(u => `
+                <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-light rounded-circle p-3 me-3 text-primary"><i class="fas fa-user"></i></div>
+                        <div>
+                            <div class="fw-bold small">${u.name}</div>
+                            <div class="text-muted" style="font-size: 0.7rem;">${u.email}</div>
+                        </div>
+                    </div>
+                    <span class="badge-soft bg-soft-success text-success small fw-bold">${u.booking_count} STAYS</span>
+                </div>
+            `).join('');
+
+            // NEW: Admin Hotel List
+            document.getElementById('admin-hotel-list').innerHTML = hotels.data.map(h => `
+                <div class="card p-3 mb-2 border-0">
+                    <div class="d-flex align-items-center">
+                        <img src="${h.image_url || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800'}" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                        <div class="flex-grow-1">
+                            <div class="fw-bold small">${h.name}</div>
+                            <div class="text-muted small">${h.location}</div>
+                        </div>
+                        <button class="btn btn-light btn-sm rounded-circle" onclick='openEditHotelModal(${JSON.stringify(h)})'>
+                            <i class="fas fa-edit text-primary"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+
+    // Modal logic for editing hotel
+    function openEditHotelModal(hotel) {
+        document.getElementById('edit-hotel-id').value = hotel.id;
+        document.getElementById('edit-hotel-name').value = hotel.name;
+        document.getElementById('edit-hotel-location').value = hotel.location;
+        document.getElementById('edit-hotel-price').value = hotel.price_per_night;
+        document.getElementById('edit-hotel-image').value = hotel.image_url || '';
+        
+        const modal = new bootstrap.Modal(document.getElementById('editHotelModal'));
+        modal.show();
+    }
+
+    document.getElementById('edit-hotel-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('edit-hotel-id').value;
+        const res = await apiCall(`/hotels/${id}`, 'PUT', {
+            name: document.getElementById('edit-hotel-name').value,
+            location: document.getElementById('edit-hotel-location').value,
+            price_per_night: document.getElementById('edit-hotel-price').value,
+            image_url: document.getElementById('edit-hotel-image').value
+        });
+        
+        if (res.success) {
+            bootstrap.Modal.getInstance(document.getElementById('editHotelModal')).hide();
+            alert('Hotel updated!');
+            loadAdminData();
+        } else alert(res.message);
+    };
+
+    async function uploadHotelImage(input) {
+        if (!input.files || !input.files[0]) return;
+        
+        const formData = new FormData();
+        formData.append('image', input.files[0]);
+
+        try {
+            const res = await fetch(`${API_BASE}/upload`, {
+                method: 'POST',
+                headers: { 'X-API-KEY': API_KEY },
+                body: formData
+            });
+            const result = await res.json();
+            if (result.success) {
+                document.getElementById('edit-hotel-image').value = result.url;
+                alert('Image uploaded successfully!');
+            } else {
+                alert('Upload failed: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            alert('An error occurred during upload.');
+        }
+    }
+
+    async function updateStatus(id, status) {
+        const res = await apiCall(`/bookings/${id}`, 'PUT', { status });
+        if (res.success) {
+            loadAdminData();
+        } else {
+            alert(res.message);
+            loadAdminData();
+        }
+    }
+
+    showSection('hero');
+
+    // Handle Modal Booking Submission
+    document.getElementById('booking-modal-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const hotelId = document.getElementById('modal-hotel-id').value;
+        const checkIn = document.getElementById('modal-check-in').value;
+        const checkOut = document.getElementById('modal-check-out').value;
+        
+        const res = await apiCall('/bookings', 'POST', {
+            hotel_id: parseInt(hotelId),
+            user_id: currentUser.id,
+            check_in: checkIn,
+            check_out: checkOut
+        });
+        
+        if (res.success) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('bookingModal'));
+            modal.hide();
+            
+            // Show Beautified Success Modal instead of alert
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            successModal.show();
+            
+            loadUserData();
+        } else alert(res.message);
+    };
+
+    function bookHotel(id, name) {
+        document.getElementById('modal-hotel-id').value = id;
+        document.getElementById('bookingHotelName').innerText = `Planning your stay at ${name}`;
+        
+        // Set default dates
+        const today = new Date().toISOString().split('T')[0];
+        const nextWeek = new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0];
+        document.getElementById('modal-check-in').value = today;
+        document.getElementById('modal-check-out').value = nextWeek;
+
+        const bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
+        bookingModal.show();
+    }
+
+    function showMap(location, hotelName) {
+        const mapFrame = document.getElementById('map-frame');
+        const encodedLocation = encodeURIComponent(location);
+        
+        // Using a generic OpenStreetMap embed for demo purposes (no API key required)
+        mapFrame.innerHTML = `
+            <iframe 
+                width="100%" 
+                height="100%" 
+                frameborder="0" 
+                scrolling="no" 
+                marginheight="0" 
+                marginwidth="0" 
+                src="https://maps.google.com/maps?q=${encodedLocation}&t=&z=13&ie=UTF8&iwloc=&output=embed">
+            </iframe>
+        `;
+        
+        document.getElementById('mapModalLabel').innerText = `Location: ${hotelName}`;
+        const mapModal = new bootstrap.Modal(document.getElementById('mapModal'));
+        mapModal.show();
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
