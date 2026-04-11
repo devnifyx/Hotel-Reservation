@@ -211,6 +211,7 @@
 <script>
     const API_BASE = '/hotel-api/api';
     const API_KEY = 'hotel-secret-key-2026';
+    const WEATHER_API_KEY = 'a0f5c401c8d4cf28091f7778f36a37ea';
     const CURRENCY = 'RM';
     let currentUser = null;
 
@@ -241,6 +242,23 @@
         return await res.json();
     }
 
+    async function fetchWeather(city) {
+        try {
+            // Clean up the location string to get a better search term for the weather API
+            // Usually taking the first part or common city names works best
+            const searchCity = city.split(' ')[0]; 
+            const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(searchCity)}&appid=${WEATHER_API_KEY}&units=metric`);
+            const data = await res.json();
+            if (data.cod === 200) {
+                return `${data.weather[0].main} ${Math.round(data.main.temp)}°C`;
+            }
+            return "Weather N/A";
+        } catch (error) {
+            console.error("Weather fetch error:", error);
+            return "Weather N/A";
+        }
+    }
+
     function logout() {
         localStorage.removeItem('hotelUser');
         window.location.href = 'login.html';
@@ -252,15 +270,14 @@
         
         document.getElementById('hotel-count').innerText = `${hotels.data.length} Properties Found`;
         
-        const weatherTypes = ['Sunny 28°C', 'Partly Cloudy 24°C', 'Clear 26°C', 'Light Rain 22°C'];
-        
-        document.getElementById('hotel-list').innerHTML = hotels.data.map(h => {
-            const randomWeather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
+        // Fetch weather for all hotels in parallel
+        const hotelCards = await Promise.all(hotels.data.map(async (h) => {
+            const weather = await fetchWeather(h.location);
             return `
                 <div class="col-md-6">
                     <div class="card h-100 border-0">
                         <div class="hotel-img-wrapper">
-                            <div class="weather-badge"><i class="fas fa-cloud-sun me-1"></i> ${randomWeather}</div>
+                            <div class="weather-badge"><i class="fas fa-cloud-sun me-1"></i> ${weather}</div>
                             <img src="${h.image_url || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800'}" alt="${h.name}">
                         </div>
                         <div class="card-body p-4">
@@ -277,7 +294,9 @@
                     </div>
                 </div>
             `;
-        }).join('');
+        }));
+
+        document.getElementById('hotel-list').innerHTML = hotelCards.join('');
 
         const myBookings = bookings.data.filter(b => b.user_id == currentUser.id);
         
