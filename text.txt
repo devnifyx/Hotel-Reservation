@@ -1,10 +1,19 @@
 save folder dalam htdocs
 
 path untuk run
+MUHAMMAD HANIF BIN MOHAMAD NIZAM (AM2412017978)
+http://localhost/hotel-api/frontend-p3/index.html
+
+MOHAMAD SYAHER IZHAM BIN ISSHAMWIL (AM2412017976)
+http://localhost/hotel-api/frontend-p1/index.html
+
+MUHAMMAD HILMI BIN JAIS (AM2412018240)
 http://localhost/hotel-api/frontend-p2/index.html
 
-customer : hilmi@email.com
-password : password123
+Admin
+email: admin@email.com
+default password : password123
 
-admin : admin@email.com
-password : password123
+Customer
+email: customer@email.com
+password: password123
