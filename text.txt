@@ -1,0 +1,10 @@
+save folder dalam htdocs
+
+path untuk run
+http://localhost/hotel-api/frontend-p2/index.html
+
+customer : hilmi@email.com
+password : password123
+
+admin : admin@email.com
+password : password123

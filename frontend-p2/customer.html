@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixora | Modern Escapes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-light: #fdfcff;      
+            --card-light: #ffffff;    
+            --border-color: #f1ecf6;  
+            --pixora-purple: #9333ea; 
+            --pixora-pink: #db2777;   
+            --pixora-cyan: #06b6d4;   
+            --accent-gradient: linear-gradient(135deg, var(--pixora-purple), var(--pixora-pink));
+            --text-main: #1f2937;     
+            --text-muted: #6b7280;    
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body { font-family: 'Outfit', sans-serif; background-color: var(--bg-light); color: var(--text-main); min-height: 100vh; padding-bottom: 50px; }
+        .gradient-text { background: var(--accent-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+
+        /* Navbar */
+        .navbar-island {
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px);
+            border: 1px solid rgba(147, 51, 234, 0.1); border-radius: 50px;
+            margin: 20px auto; max-width: 1000px; padding: 12px 25px;
+            box-shadow: 0 10px 40px rgba(147, 51, 234, 0.06); position: sticky; top: 20px; z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .brand-logo { font-size: 1.5rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin: 0; }
+
+        .hero-section { padding: 60px 0 40px; }
+        .hero-title { font-size: 3.5rem; font-weight: 800; letter-spacing: -1px; line-height: 1.1; }
+
+        /* SEARCH BAR */
+        .search-bar-wrap { background: #fff; border-radius: 50px; padding: 8px 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid var(--border-color); max-width: 700px; margin: 0 auto 40px; display: flex; gap: 10px; align-items: center;}
+        .search-bar-wrap input, .search-bar-wrap select { border: none; background: transparent; font-weight: 500; color: var(--text-main); outline: none; box-shadow: none !important;}
+
+        /* Hotel Cards */
+        .pix-card { background: var(--card-light); border-radius: 28px; padding: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: var(--transition); height: 100%; display: flex; flex-direction: column; }
+        .pix-card:hover { box-shadow: 0 20px 40px rgba(147, 51, 234, 0.08); transform: translateY(-8px); border-color: rgba(219, 39, 119, 0.2); }
+        .pix-img-wrap { border-radius: 20px; overflow: hidden; position: relative; height: 240px; }
+        .pix-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+        .pix-card:hover .pix-img-wrap img { transform: scale(1.08); }
+        
+        .weather-pill { position: absolute; top: 12px; left: 12px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); border-radius: 20px; padding: 5px 12px; font-size: 0.75rem; font-weight: 600; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        
+        /* BUTANG HATI (WISHLIST) */
+        .wishlist-btn {
+            position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; 
+            background: rgba(255, 255, 255, 0.9); border: none; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.2s ease; z-index: 10;
+        }
+        .wishlist-btn:hover { transform: scale(1.1); background: #fff; }
+        .wishlist-btn i { font-size: 1.1rem; color: #cbd5e1; transition: 0.2s ease; }
+        .wishlist-btn.active i { color: #ef4444; }
+
+        .pix-content { padding: 20px 10px 10px; display: flex; flex-direction: column; flex-grow: 1; }
+        .pix-price { font-size: 1.4rem; font-weight: 800; color: var(--text-main); }
+        
+        /* Tickets */
+        .ticket-card { background: #fff; border-left: 5px solid var(--pixora-purple); border-radius: 16px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); border-top: 1px solid var(--border-color); border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); transition: var(--transition); }
+        .status-badge { padding: 5px 15px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+        .status-confirmed { background: rgba(6, 182, 212, 0.1); color: #0891b2; }
+        .status-pending { background: rgba(219, 39, 119, 0.1); color: #be185d; }
+        .status-cancelled { background: #fef2f2; color: #ef4444; border: 1px solid #fee2e2; }
+
+        /* Buttons */
+        .btn-pixora { background: var(--accent-gradient); color: #fff; font-weight: 600; border: none; border-radius: 12px; padding: 12px 20px; transition: var(--transition); }
+        .btn-pixora:hover { color: #fff; transform: scale(1.02); box-shadow: 0 6px 20px rgba(219, 39, 119, 0.3); }
+        .btn-icon-only { background: #f9fafb; color: var(--text-main); border: 1px solid #e5e7eb; border-radius: 12px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+        .btn-icon-only:hover { background: var(--accent-gradient); color: #fff; border-color: transparent; }
+        .modal-content { border: none; border-radius: 24px; }
+        .form-control, .form-select { background-color: #f9fafb; border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; }
+        .form-control:focus, .form-select:focus { background-color: #fff; border-color: var(--pixora-purple); box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.1); }
+        .form-label { color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; }
+        .offcanvas-header { border-bottom: 1px solid var(--border-color); }
+
+        /* REVIEW MODAL CSS */
+        .star-rating i { color: #e5e7eb; cursor: pointer; font-size: 1.5rem; transition: 0.2s;}
+        .star-rating i.active { color: #fbbf24; }
+        .review-bubble { background: #f9fafb; border-radius: 16px; padding: 15px; margin-bottom: 10px; border: 1px solid var(--border-color);}
+    </style>
+</head>
+<body>
+
+<div class="px-3">
+    <nav class="navbar-island">
+        <h1 class="brand-logo mb-0">PIX<span class="gradient-text">ORA.</span></h1>
+        <div class="d-flex align-items-center gap-2">
+            <span class="text-muted small fw-medium d-none d-md-block me-3">Hi, <span id="user-display" class="text-dark fw-bold"></span></span>
+            
+            <button class="btn btn-light rounded-pill px-3 fw-bold text-danger border shadow-sm" data-bs-toggle="offcanvas" data-bs-target="#wishlistOffcanvas" style="font-size: 0.85rem;">
+                <i class="fas fa-heart me-1"></i> Saved
+            </button>
+            
+            <button class="btn btn-light rounded-pill px-3 fw-bold text-dark border shadow-sm" onclick="logout()" style="font-size: 0.85rem;">
+                <i class="fas fa-power-off me-1 text-muted"></i>
+            </button>
+        </div>
+    </nav>
+</div>
+
+<div class="container">
+    <div class="hero-section text-center">
+        <h1 class="hero-title">Where to next, <br><span class="gradient-text" id="hero-display">Traveler</span>?</h1>
+        <p class="text-muted mt-3 mb-4" style="font-size: 1.1rem;">Discover extraordinary spaces for your next getaway.</p>
+        
+        <div class="search-bar-wrap">
+            <i class="fas fa-search text-muted ms-2"></i>
+            <input type="text" id="filter-text" class="form-control" placeholder="Search by hotel or location...">
+            <div class="border-start ps-2 pe-2"></div>
+            <select id="filter-price" class="form-select w-auto">
+                <option value="9999">Any Price</option>
+                <option value="300">Under RM300</option>
+                <option value="500">Under RM500</option>
+                <option value="1000">Under RM1000</option>
+            </select>
+            <button class="btn btn-pixora rounded-pill px-4" onclick="applyFilters()">Search</button>
+        </div>
+    </div>
+
+    <div id="itinerary-section" class="mb-5 pb-4 border-bottom" style="display: none;">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <h4 class="fw-bold mb-0">Your Upcoming Trips</h4>
+            <button class="btn btn-light border shadow-sm rounded-pill fw-medium px-3 text-muted" data-bs-toggle="offcanvas" data-bs-target="#historyOffcanvas" style="font-size: 0.85rem;">
+                <i class="fas fa-history me-1"></i> Trip History
+            </button>
+        </div>
+        <div class="row g-4" id="my-bookings"></div>
+    </div>
+
+    <div>
+        <div class="d-flex justify-content-between align-items-end mb-4 mt-4">
+            <h4 class="fw-bold mb-0">Curated Collections</h4>
+            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill" id="hotel-count"></span>
+        </div>
+        <div class="row g-4" id="hotel-list"></div>
+    </div>
+</div>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="wishlistOffcanvas"><div class="offcanvas-header border-0 pb-0"><h5 class="fw-bold mb-0"><i class="fas fa-heart me-2 text-danger"></i>Saved Stays</h5><button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button></div><div class="offcanvas-body bg-light pt-3"><p class="text-muted small mb-4">Hotels you love, saved for later.</p><div class="d-flex flex-column gap-3" id="wishlist-items"></div></div></div>
+<div class="offcanvas offcanvas-end" tabindex="-1" id="historyOffcanvas"><div class="offcanvas-header"><h5 class="fw-bold mb-0"><i class="fas fa-history me-2 text-muted"></i>Trip History</h5><button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button></div><div class="offcanvas-body bg-light"><p class="text-muted small mb-4">Past and cancelled reservations will appear here.</p><div class="d-flex flex-column gap-3" id="history-bookings"></div></div></div>
+
+<div class="modal fade" id="bookingModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content shadow-lg p-2"><div class="modal-header border-0 pb-0"><h4 class="fw-bold mb-0">Select Dates</h4><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-4 pt-3"><p class="text-muted fw-medium mb-4" id="bookingHotelName"></p><form id="booking-modal-form"><input type="hidden" id="modal-hotel-id"><div class="bg-light p-3 rounded-3 border mb-4 d-flex justify-content-between align-items-center"><span class="small fw-bold text-muted">PRICE PER NIGHT</span><span class="fw-bold text-dark fs-5" id="modal-price-display"></span></div><div class="row g-3 mb-4"><div class="col-6"><label class="form-label">Check-in</label><input type="date" id="modal-check-in" class="form-control" required></div><div class="col-6"><label class="form-label">Check-out</label><input type="date" id="modal-check-out" class="form-control" required></div></div><button type="submit" class="btn btn-pixora w-100 py-3 fs-5">Secure Reservation</button></form></div></div></div></div>
+
+<div class="modal fade" id="paymentModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content shadow-lg p-2 text-center"><div class="modal-body p-5"><div class="mb-4"><i class="fas fa-check-circle fs-1" style="color: var(--pixora-cyan);"></i></div><h3 class="fw-bold mb-2">Finalize Booking</h3><p class="text-muted mb-4">You are paying for <span id="pay-hotel-name" class="text-dark fw-bold"></span></p><div class="p-4 mb-4 rounded-4" style="background: rgba(147, 51, 234, 0.05); border: 1px dashed rgba(147, 51, 234, 0.2);"><span class="text-muted small d-block fw-bold mb-1">TOTAL AMOUNT</span><span class="fs-1 fw-bold gradient-text" id="pay-amount-display"></span><span class="d-block small text-muted mt-2 fw-medium" id="pay-duration-display"></span></div><form id="payment-demo-form"><input type="hidden" id="pay-booking-id"><input type="hidden" id="pay-amount-value"><div class="text-start mb-4"><label class="form-label">Payment Method</label><select class="form-select fw-medium" id="pay-method"><option>Credit Card</option><option>Online Banking (FPX)</option></select></div><button type="submit" class="btn btn-pixora w-100 py-3 fs-5"><i class="fas fa-lock me-2"></i>Pay Securely</button></form></div></div></div></div>
+
+<div class="modal fade" id="mapModal" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content p-2"><div class="modal-header border-0 pb-0"><h5 class="modal-title fw-bold" id="mapModalLabel"></h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-4"><div id="map-frame" style="height: 400px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border-color);"></div></div></div></div></div>
+
+<div class="modal fade" id="reviewModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"><div class="modal-content shadow-lg p-2" style="border:none; border-radius: 24px;"><div class="modal-header border-0 pb-0"><h4 class="fw-bold mb-0">Guest Reviews</h4><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-4 pt-3"><div id="reviews-list" class="mb-4"></div><div class="p-3 rounded-4" style="background: rgba(147,51,234,0.05); border: 1px solid rgba(147,51,234,0.1);"><h6 class="fw-bold mb-3">Leave a review</h6><input type="hidden" id="rev-hotel-id"><div class="star-rating mb-2" id="star-selector"><i class="fas fa-star" data-val="1"></i><i class="fas fa-star" data-val="2"></i><i class="fas fa-star" data-val="3"></i><i class="fas fa-star" data-val="4"></i><i class="fas fa-star" data-val="5"></i></div><input type="hidden" id="rev-rating-val" value="0"><textarea id="rev-comment" class="form-control mb-3" rows="2" placeholder="Tell us about your experience..." style="border-radius:12px;"></textarea><button id="btn-submit-review" class="btn btn-pixora w-100" onclick="submitReview()">Submit Review</button></div></div></div></div></div>
+
+<script>
+    const API_BASE = '/hotel-api/api';
+    const API_KEY = 'hotel-secret-key-2026';
+    const CURRENCY = 'RM';
+    let currentUser = null;
+    let currentSelectedPrice = 0;
+    
+    let allHotelsData = [];
+    let globalWishlistIds = [];
+
+    const storedUser = localStorage.getItem('hotelUser');
+    if (!storedUser) window.location.href = 'login.html';
+    else {
+        currentUser = JSON.parse(storedUser);
+        if (currentUser.role === 'admin') window.location.href = 'admin.html';
+        document.getElementById('user-display').innerText = currentUser.name;
+        document.getElementById('hero-display').innerText = currentUser.name;
+    }
+
+    const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    function logout() { localStorage.removeItem('hotelUser'); window.location.href = 'login.html'; }
+
+    async function apiCall(endpoint, method = 'GET', body = null) {
+        const options = { method, headers: { 'X-API-KEY': API_KEY, 'Content-Type': 'application/json' } };
+        if (body) options.body = JSON.stringify(body);
+        const res = await fetch(`${API_BASE}${endpoint}`, options);
+        const textResponse = await res.text();
+        try { return JSON.parse(textResponse); } catch (e) { throw new Error(textResponse); }
+    }
+
+    // ==========================================
+    // FUNGSI API CUACA LIVE (BARU!)
+    // ==========================================
+    async function fetchRealWeather(hotelId, locationName) {
+        try {
+            // Tapis perkataan supaya mudah dijumpai oleh Geocoder satelit
+            let searchQuery = locationName.toLowerCase();
+            if(searchQuery.includes('kl') || searchQuery.includes('kuala lumpur') || searchQuery.includes('trx')) searchQuery = 'Kuala Lumpur';
+            else if(searchQuery.includes('penang')) searchQuery = 'Penang';
+            else if(searchQuery.includes('putrajaya')) searchQuery = 'Putrajaya';
+            else if(searchQuery.includes('sunway') || searchQuery.includes('jaya')) searchQuery = 'Petaling Jaya';
+            else searchQuery = locationName; 
+
+            // 1. Cari Koordinat (Latitude & Longitude)
+            const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(searchQuery)}&count=1&language=en&format=json`);
+            const geoData = await geoRes.json();
+
+            const pill = document.getElementById(`weather-${hotelId}`);
+            if(!pill) return; // Keluar jika kad dah takde di skrin
+
+            if (geoData.results && geoData.results.length > 0) {
+                const lat = geoData.results[0].latitude;
+                const lon = geoData.results[0].longitude;
+
+                // 2. Ambil Cuaca Semasa menggunakan Koordinat
+                const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                const weatherData = await weatherRes.json();
+
+                const temp = Math.round(weatherData.current_weather.temperature);
+                const wmoCode = weatherData.current_weather.weathercode;
+
+                // Padankan kod satelit kepada ikon dan teks
+                let icon = 'fa-sun text-warning'; let text = 'Sunny';
+                if (wmoCode >= 1 && wmoCode <= 3) { icon = 'fa-cloud-sun text-secondary'; text = 'Cloudy'; }
+                else if (wmoCode >= 51 && wmoCode <= 67) { icon = 'fa-cloud-rain text-primary'; text = 'Rain'; }
+                else if (wmoCode >= 71 && wmoCode <= 77) { icon = 'fa-snowflake text-info'; text = 'Snow'; }
+                else if (wmoCode >= 95) { icon = 'fa-bolt text-danger'; text = 'Storm'; }
+
+                // Paparkan di kad hotel
+                pill.innerHTML = `<i class="fas ${icon} me-1"></i> ${text} ${temp}°C`;
+            } else {
+                // Fallback kalau nama tempat pelik sangat
+                pill.innerHTML = `<i class="fas fa-cloud-sun text-secondary me-1"></i> Cloudy 28°C`;
+            }
+        } catch (error) {
+            const pill = document.getElementById(`weather-${hotelId}`);
+            if(pill) pill.innerHTML = `<i class="fas fa-cloud text-secondary me-1"></i> --°C`;
+        }
+    }
+
+
+    async function loadUserData() {
+        try {
+            const hotels = await apiCall('/hotels');
+            const bookings = await apiCall('/bookings');
+            
+            let wishlistRes = { success: false, data: [] };
+            try { wishlistRes = await apiCall(`/wishlists/${currentUser.id}`); } catch (err) { console.error(err); }
+            
+            if (!hotels.data) throw new Error("Failed to load hotel data.");
+            
+            globalWishlistIds = wishlistRes.success ? wishlistRes.data.map(id => parseInt(id)) : [];
+            allHotelsData = hotels.data;
+
+            renderHotels(allHotelsData);
+
+            const savedHotels = hotels.data.filter(h => globalWishlistIds.includes(parseInt(h.id)));
+            if (savedHotels.length > 0) {
+                document.getElementById('wishlist-items').innerHTML = savedHotels.map(h => `
+                    <div class="bg-white p-3 rounded-4 border shadow-sm d-flex gap-3 align-items-center">
+                        <img src="${h.image_url || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800'}" class="rounded-3" style="width: 80px; height: 80px; object-fit: cover;">
+                        <div class="flex-grow-1">
+                            <h6 class="fw-bold mb-1 text-dark text-truncate" style="max-width: 150px;">${h.name}</h6>
+                            <p class="text-muted mb-2" style="font-size: 0.8rem;">${CURRENCY}${h.price_per_night} /nt</p>
+                            <button class="btn btn-sm btn-pixora w-100 fw-bold" onclick="bookHotel(${h.id}, '${h.name}', ${h.price_per_night})">Book Now</button>
+                        </div>
+                        <button class="btn btn-light text-danger rounded-circle border shadow-sm p-2" onclick="toggleWishlist(${h.id})" title="Remove">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('wishlist-items').innerHTML = `<div class="text-center text-muted p-4 mt-4"><i class="far fa-heart fs-1 mb-3 opacity-25"></i><br>You haven't saved any hotels yet.</div>`;
+            }
+
+            const myBookings = (bookings.data || []).filter(b => b.user_id == currentUser.id);
+            const itinerarySection = document.getElementById('itinerary-section');
+            if (myBookings.length > 0) {
+                itinerarySection.style.display = 'block';
+                const activeBookings = myBookings.filter(b => b.status !== 'cancelled');
+                const cancelledBookings = myBookings.filter(b => b.status === 'cancelled');
+
+                if (activeBookings.length > 0) {
+                    document.getElementById('my-bookings').innerHTML = activeBookings.map(b => {
+                        const ci = new Date(b.check_in); const co = new Date(b.check_out);
+                        const diffDays = Math.max(1, Math.ceil((co - ci) / (1000 * 60 * 60 * 24)));
+                        const totalAmount = (diffDays * parseFloat(b.price_per_night)).toFixed(2);
+                        return `<div class="col-md-6 col-lg-6"><div class="ticket-card"><div class="d-flex justify-content-between align-items-center mb-3"><h5 class="fw-bold mb-0 text-dark">${b.hotel_name}</h5><span class="status-badge status-${b.status}">${b.status}</span></div><div class="d-flex align-items-center text-muted small mb-3 fw-medium"><div class="bg-light px-3 py-2 rounded-3 border"><i class="far fa-calendar-alt me-2 text-primary"></i>${formatDate(b.check_in)}</div><i class="fas fa-long-arrow-alt-right mx-3 opacity-50"></i><div class="bg-light px-3 py-2 rounded-3 border"><i class="far fa-calendar-check me-2 text-primary"></i>${formatDate(b.check_out)}</div></div><div class="d-flex gap-2 pt-2">${b.status === 'pending' ? `<button class="btn btn-pixora flex-grow-1 py-2" onclick="openPaymentModal(${b.id}, '${b.hotel_name}', ${totalAmount}, ${diffDays})">Pay ${CURRENCY}${totalAmount}</button>` : ''}<button class="btn btn-outline-danger px-4 rounded-3 fw-bold" onclick="cancelBooking(${b.id})">Cancel Trip</button></div></div></div>`;
+                    }).join('');
+                } else { document.getElementById('my-bookings').innerHTML = `<div class="col-12"><div class="p-4 bg-light rounded-4 text-center text-muted" style="border: 1px dashed #ccc;">No active upcoming trips. Ready for your next adventure?</div></div>`; }
+
+                if (cancelledBookings.length > 0) {
+                    document.getElementById('history-bookings').innerHTML = cancelledBookings.map(b => `<div class="bg-white p-3 rounded-4 border shadow-sm"><div class="d-flex justify-content-between align-items-start mb-2"><h6 class="fw-bold mb-0 text-dark">${b.hotel_name}</h6><span class="status-badge status-cancelled">CANCELLED</span></div><p class="text-muted mb-0" style="font-size: 0.8rem;">${formatDate(b.check_in)} <i class="fas fa-arrow-right mx-1 opacity-50"></i> ${formatDate(b.check_out)}</p></div>`).join('');
+                } else { document.getElementById('history-bookings').innerHTML = `<div class="text-center text-muted p-4">Your history is clean.</div>`; }
+            } else { itinerarySection.style.display = 'none'; }
+        } catch (error) { document.getElementById('hotel-list').innerHTML = `<div class="col-12"><div class="alert alert-danger border-danger bg-white text-danger shadow-sm"><i class="fas fa-exclamation-circle me-2"></i> ${error.message}</div></div>`; }
+    }
+
+    function renderHotels(hotelsArray) {
+        document.getElementById('hotel-count').innerText = `${hotelsArray.length} Stays`;
+        
+        if(hotelsArray.length === 0) {
+            document.getElementById('hotel-list').innerHTML = `<div class="col-12 text-center text-muted p-5">No hotels found matching your criteria.</div>`;
+            return;
+        }
+        
+        document.getElementById('hotel-list').innerHTML = hotelsArray.map(h => {
+            const isLiked = globalWishlistIds.includes(parseInt(h.id));
+            const activeClass = isLiked ? 'active' : '';
+            const heartClass = isLiked ? 'fas' : 'far';
+
+            return `
+                <div class="col-lg-4 col-md-6">
+                    <div class="pix-card">
+                        <div class="pix-img-wrap">
+                            <div class="weather-pill" id="weather-${h.id}">
+                                <i class="fas fa-spinner fa-spin text-muted me-1"></i> Loading...
+                            </div>
+
+                            <button class="wishlist-btn ${activeClass}" id="wishlist-btn-${h.id}" onclick="toggleWishlist(${h.id})">
+                                <i class="${heartClass} fa-heart" id="wishlist-icon-${h.id}"></i>
+                            </button>
+                            <img src="${h.image_url || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800'}" alt="${h.name}">
+                        </div>
+                        <div class="pix-content">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="fw-bold mb-0 text-truncate pe-2">${h.name}</h5>
+                                <button class="btn btn-sm btn-light border text-warning fw-bold rounded-pill px-2 py-0" style="height: 24px; font-size: 0.75rem;" onclick="openReviews(${h.id}, '${h.name}')">
+                                    <i class="fas fa-star me-1"></i>Reviews
+                                </button>
+                            </div>
+                            <p class="small text-muted mb-3"><i class="fas fa-map-marker-alt me-2" style="color: var(--pixora-pink);"></i>${h.location}</p>
+                            <div class="mt-auto d-flex justify-content-between align-items-center pt-2">
+                                <div><span class="pix-price">${CURRENCY}${h.price_per_night}</span><span class="text-muted small">/night</span></div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn-icon-only shadow-sm" onclick="showMap('${h.location}', '${h.name}')"><i class="fas fa-map text-secondary"></i></button>
+                                    <button class="btn btn-pixora shadow-sm" onclick="bookHotel(${h.id}, '${h.name}', ${h.price_per_night})">Book</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // PANGGIL API CUACA SELEPAS KAD HOTEL SIAP DI-RENDER
+        hotelsArray.forEach(h => {
+            fetchRealWeather(h.id, h.location);
+        });
+    }
+
+    function applyFilters() {
+        const text = document.getElementById('filter-text').value.toLowerCase();
+        const maxPrice = parseFloat(document.getElementById('filter-price').value);
+        
+        const filtered = allHotelsData.filter(h => {
+            const matchText = h.name.toLowerCase().includes(text) || h.location.toLowerCase().includes(text);
+            const matchPrice = parseFloat(h.price_per_night) <= maxPrice;
+            return matchText && matchPrice;
+        });
+        
+        renderHotels(filtered);
+    }
+
+    async function openReviews(id, name) {
+        document.getElementById('rev-hotel-id').value = id;
+        document.getElementById('rev-comment').value = '';
+        setRating(0);
+
+        try {
+            const res = await apiCall(`/reviews/${id}`);
+            const listDiv = document.getElementById('reviews-list');
+            
+            if (res.success && res.data.length > 0) {
+                listDiv.innerHTML = res.data.map(r => `
+                    <div class="review-bubble">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="fw-bold text-dark">${r.user_name}</span>
+                            <span class="text-warning small">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+                        </div>
+                        <p class="mb-0 text-muted small">${r.comment}</p>
+                    </div>
+                `).join('');
+            } else {
+                listDiv.innerHTML = `<div class="text-center text-muted small py-3">No reviews yet. Be the first!</div>`;
+            }
+        } catch (e) {
+            console.error("Review API failed", e);
+            document.getElementById('reviews-list').innerHTML = `<div class="text-center text-danger small py-3">Error loading reviews. Check backend.</div>`;
+        }
+        
+        new bootstrap.Modal(document.getElementById('reviewModal')).show();
+    }
+
+    const stars = document.querySelectorAll('#star-selector i');
+    stars.forEach(star => { star.addEventListener('click', function() { setRating(this.getAttribute('data-val')); }); });
+    
+    function setRating(val) {
+        document.getElementById('rev-rating-val').value = val;
+        stars.forEach(s => {
+            if (parseInt(s.getAttribute('data-val')) <= val) s.classList.add('active');
+            else s.classList.remove('active');
+        });
+    }
+
+    async function submitReview() {
+        const hotel_id = document.getElementById('rev-hotel-id').value;
+        const rating = document.getElementById('rev-rating-val').value;
+        const comment = document.getElementById('rev-comment').value;
+
+        if (rating == 0 || comment.trim() === '') { alert("Please provide a rating and comment."); return; }
+
+        const btn = document.getElementById('btn-submit-review');
+        const originalText = btn.innerText;
+        btn.innerText = "Submitting...";
+        btn.disabled = true;
+
+        const res = await apiCall('/reviews', 'POST', { 
+            user_id: currentUser.id, 
+            hotel_id: parseInt(hotel_id), 
+            rating: parseInt(rating), 
+            comment: comment 
+        });
+
+        if (res.success) {
+            alert('Review submitted!');
+            document.getElementById('rev-comment').value = '';
+            setRating(0);
+            
+            try {
+                const revRes = await apiCall(`/reviews/${hotel_id}`);
+                const listDiv = document.getElementById('reviews-list');
+                
+                if (revRes.success && revRes.data.length > 0) {
+                    listDiv.innerHTML = revRes.data.map(r => `
+                        <div class="review-bubble">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-bold text-dark">${r.user_name}</span>
+                                <span class="text-warning small">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+                            </div>
+                            <p class="mb-0 text-muted small">${r.comment}</p>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                console.error("Gagal refresh senarai ulasan", e);
+            }
+        } else {
+            alert(res.message);
+        }
+
+        btn.innerText = originalText;
+        btn.disabled = false;
+    }
+
+    async function toggleWishlist(hotelId) {
+        try {
+            const btn = document.getElementById(`wishlist-btn-${hotelId}`);
+            const icon = document.getElementById(`wishlist-icon-${hotelId}`);
+            
+            if (btn.classList.contains('active')) {
+                btn.classList.remove('active'); icon.classList.remove('fas'); icon.classList.add('far');
+            } else {
+                btn.classList.add('active'); icon.classList.remove('far'); icon.classList.add('fas');
+            }
+
+            const res = await apiCall('/wishlists', 'POST', {
+                user_id: currentUser.id,
+                hotel_id: parseInt(hotelId) 
+            });
+
+            if (res.success) {
+                loadUserData(); // Update sidebar
+            } else {
+                alert("Gagal simpan ke database.");
+                loadUserData(); // Reverse balik jika error
+            }
+        } catch (error) {
+            alert("Ralat API Wishlist! Sila check file index.php");
+            loadUserData();
+        }
+    }
+
+    async function cancelBooking(id) { if (!confirm('Cancel this reservation? This action cannot be undone.')) return; const res = await apiCall(`/bookings/cancel/${id}`, 'POST'); if (res.success) loadUserData(); else alert(res.message); }
+    function bookHotel(id, name, price) { currentSelectedPrice = parseFloat(price); document.getElementById('modal-hotel-id').value = id; document.getElementById('bookingHotelName').innerText = name; document.getElementById('modal-price-display').innerText = `${CURRENCY}${price}`; const today = new Date().toISOString().split('T')[0]; document.getElementById('modal-check-in').value = today; document.getElementById('modal-check-out').value = new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0]; new bootstrap.Modal(document.getElementById('bookingModal')).show(); }
+    document.getElementById('booking-modal-form').onsubmit = async (e) => { e.preventDefault(); const hotelName = document.getElementById('bookingHotelName').innerText; const checkIn = new Date(document.getElementById('modal-check-in').value); const checkOut = new Date(document.getElementById('modal-check-out').value); const diffDays = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24)); if (diffDays <= 0) { alert("Sila pastikan tarikh Check-out adalah selepas tarikh Check-in."); return; } const totalAmount = (diffDays * currentSelectedPrice).toFixed(2); const res = await apiCall('/bookings', 'POST', { hotel_id: parseInt(document.getElementById('modal-hotel-id').value), user_id: currentUser.id, check_in: document.getElementById('modal-check-in').value, check_out: document.getElementById('modal-check-out').value }); if (res.success) { bootstrap.Modal.getInstance(document.getElementById('bookingModal')).hide(); openPaymentModal(res.booking_id, hotelName, totalAmount, diffDays); loadUserData(); } else alert(res.message); };
+    function openPaymentModal(bookingId, hotelName, amount, days) { document.getElementById('pay-booking-id').value = bookingId; document.getElementById('pay-hotel-name').innerText = hotelName; document.getElementById('pay-amount-display').innerText = `${CURRENCY}${amount}`; document.getElementById('pay-duration-display').innerText = `Untuk penginapan selama ${days} malam`; document.getElementById('pay-amount-value').value = amount; new bootstrap.Modal(document.getElementById('paymentModal')).show(); }
+    document.getElementById('payment-demo-form').onsubmit = async (e) => { e.preventDefault(); const createRes = await apiCall('/payments', 'POST', { booking_id: parseInt(document.getElementById('pay-booking-id').value), amount: parseFloat(document.getElementById('pay-amount-value').value), method: document.getElementById('pay-method').value }); if (createRes.success) { const updateRes = await apiCall(`/payments/${createRes.id}`, 'PUT', { status: 'paid' }); if (updateRes.success) { bootstrap.Modal.getInstance(document.getElementById('paymentModal')).hide(); alert('Payment successful! View your updated Itinerary.'); loadUserData(); } } };
+    function showMap(location, hotelName) { document.getElementById('map-frame').innerHTML = `<iframe width="100%" height="100%" frameborder="0" src="https://maps.google.com/maps?q=$${encodeURIComponent(location)}&t=&z=13&ie=UTF8&iwloc=&output=embed"></iframe>`; document.getElementById('mapModalLabel').innerText = hotelName; new bootstrap.Modal(document.getElementById('mapModal')).show(); }
+
+    loadUserData();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixora | Access</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-light: #fdfcff;
+            --pixora-purple: #9333ea; 
+            --pixora-pink: #db2777;   
+            --accent-gradient: linear-gradient(135deg, var(--pixora-purple), var(--pixora-pink));
+            --text-main: #1f2937;
+            --transition: all 0.3s ease;
+        }
+
+        body { font-family: 'Outfit', sans-serif; background: var(--bg-light); color: var(--text-main); min-height: 100vh; margin: 0; }
+        
+        .gradient-text {
+            background: var(--accent-gradient); 
+            -webkit-background-clip: text; 
+            background-clip: text;
+            -webkit-text-fill-color: transparent; 
+            color: transparent;
+        }
+
+        /* Split Panels Moden */
+        .split-wrapper { display: flex; min-height: 100vh; padding: 20px; gap: 20px; }
+        
+        /* GAMBAR BACKGROUND BARU (FULL HD & MENARIK) */
+        .img-panel { 
+            flex: 1.2; border-radius: 32px; 
+            background: url('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat; 
+            position: relative; overflow: hidden; display: none; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .img-panel::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, transparent 100%); }
+        .img-content { position: absolute; bottom: 40px; left: 40px; right: 40px; color: white; z-index: 2; }
+        
+        .form-panel { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem; background: transparent; }
+        .form-box { width: 100%; max-width: 400px; }
+        
+        /* DESIGN BORDER INPUT YANG BARU */
+        .form-control { 
+            background-color: #ffffff; 
+            border: 2px solid #cbd5e1; /* Border kelabu yang lebih tebal dan jelas */
+            border-radius: 12px; 
+            padding: 14px; 
+            font-weight: 500; 
+            color: var(--text-main);
+            transition: var(--transition);
+        }
+        .form-control:focus { 
+            background-color: #ffffff; 
+            border-color: var(--pixora-purple); /* Bertukar ungu bila ditekan */
+            box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.15); 
+            outline: none;
+        }
+        .form-control::placeholder { color: #94a3b8; font-weight: 400; }
+        .form-label { color: #475569; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .btn-pixora { background: var(--accent-gradient); color: #fff; font-weight: 600; border: none; border-radius: 12px; padding: 14px; transition: var(--transition); }
+        .btn-pixora:hover { color: #fff; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(219, 39, 119, 0.2); }
+        
+        #register-section { display: none; }
+        .switch-link { color: var(--pixora-purple); font-weight: 700; text-decoration: none; cursor: pointer; transition: var(--transition); }
+        .switch-link:hover { color: var(--pixora-pink); text-decoration: underline; }
+
+        @media (min-width: 992px) { .img-panel { display: block; } }
+    </style>
+</head>
+<body>
+
+<div class="split-wrapper">
+    <div class="img-panel">
+        <div class="img-content">
+            <h1 class="display-4 fw-bold mb-3">PIX<span style="background: linear-gradient(to right, #d8b4fe, #fbcfe8); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;">ORA.</span></h1>
+            <p class="lead fw-light">Carefully chosen premium vacation experiences for today's travelers. Discover an unparalleled world of magnificence.</p>
+        </div>
+    </div>
+    
+    <div class="form-panel">
+        <div class="form-box" id="login-section">
+            <h2 class="fw-bold mb-2">Welcome Back</h2>
+            <p class="text-muted mb-4 fw-medium">Log in to access your upcoming trips.</p>
+            <form id="login-form">
+                <div class="mb-3">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="login-email" class="form-control" placeholder="you@example.com" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="login-pass" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-pixora w-100 mb-4 fs-5">Sign In</button>
+                <p class="text-center text-muted small fw-medium">Don't have an account? <a class="switch-link" onclick="toggleView('register')">Register now</a></p>
+            </form>
+        </div>
+
+        <div class="form-box" id="register-section">
+            <h2 class="fw-bold mb-2 text-dark">Join <span class="gradient-text">Pixora</span></h2>
+            <p class="text-muted mb-4 fw-medium">Create an account to book exclusive properties.</p>
+            <form id="register-form">
+                <div class="mb-3"><label class="form-label">Full Name</label><input type="text" id="reg-name" class="form-control" placeholder="John Doe" required></div>
+                <div class="mb-3"><label class="form-label">Email Address</label><input type="email" id="reg-email" class="form-control" placeholder="you@example.com" required></div>
+                <div class="mb-4"><label class="form-label">Password</label><input type="password" id="reg-pass" class="form-control" placeholder="Create a strong password" required></div>
+                <button type="submit" class="btn btn-pixora w-100 mb-4 fs-5">Create Account</button>
+                <p class="text-center text-muted small fw-medium">Have an account? <a class="switch-link" onclick="toggleView('login')">Sign In here</a></p>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = '/hotel-api/api';
+    const storedUser = localStorage.getItem('hotelUser');
+    if (storedUser) {
+        const user = JSON.parse(storedUser);
+        window.location.href = user.role === 'admin' ? 'admin.html' : 'customer.html';
+    }
+
+    function toggleView(view) {
+        document.getElementById('login-section').style.display = view === 'login' ? 'block' : 'none';
+        document.getElementById('register-section').style.display = view === 'register' ? 'block' : 'none';
+    }
+
+    async function apiCall(endpoint, method = 'GET', body = null) {
+        const options = { method, headers: { 'X-API-KEY': 'hotel-secret-key-2026', 'Content-Type': 'application/json' } };
+        if (body) options.body = JSON.stringify(body);
+        const res = await fetch(`${API_BASE}${endpoint}`, options);
+        return await res.json();
+    }
+
+    document.getElementById('login-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const res = await apiCall('/users/login', 'POST', {
+            email: document.getElementById('login-email').value,
+            password: document.getElementById('login-pass').value
+        });
+        if (res.success) {
+            localStorage.setItem('hotelUser', JSON.stringify(res.user));
+            window.location.href = res.user.role === 'admin' ? 'admin.html' : 'customer.html';
+        } else alert(res.message);
+    };
+
+    document.getElementById('register-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const res = await apiCall('/users', 'POST', {
+            name: document.getElementById('reg-name').value,
+            email: document.getElementById('reg-email').value,
+            password: document.getElementById('reg-pass').value
+        });
+        if (res.success) {
+            alert('Membership approved! Please sign in.');
+            toggleView('login');
+        } else alert(res.message);
+    };
+</script>
+</body>
+</html>
